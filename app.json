@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "UTCDForms",
+    "slug": "utcdforms",
+    "owner": "devutcd",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "utcd-forms",
+    "icon": "./assets/splash-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.utcd-forms.mobile",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show you the nearest forms."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.utcdforms.mobile"
+    },
+    "web": {
+      "favicon": "./assets/splash-icon-icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f6ff5fb7-c3ae-4d64-b59e-7e3b0094a71c"
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
+    "plugins": [
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ],
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f6ff5fb7-c3ae-4d64-b59e-7e3b0094a71c"
+    }
+  }
+}

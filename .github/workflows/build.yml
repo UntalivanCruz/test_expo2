@@ -1,0 +1,70 @@
+name: Build image
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+ mobile:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: 17
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Install expo-dev-client
+      run: npx expo install expo-dev-client
+
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Install EAS CLI
+      run: npm install -g eas-cli
+
+    - name: Accept Android licenses
+      run: |
+        yes | sudo sdkmanager --licenses || true
+
+    - name: Build APK locally with EAS
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      run: |
+        eas build --platform android --profile development --local --non-interactive --output=./app-release.apk
+
+    - name: Rename APK with version tag
+      id: rename_apk
+      run: |
+        VERSION=${{ github.ref_name }}
+        mkdir -p build
+        mv app-release.apk build/UTCDForms-${VERSION}.apk
+        echo "APK_FINAL_PATH=mobile/build/UTCDForms-${VERSION}.apk" >> $GITHUB_OUTPUT
+
+    - name: Generar información de release
+      id: release_info
+      run: |
+        BUILD_URL="https://expo.dev/accounts/devutcd/projects/utcdforms/builds/${EAS_BUILD_ID}"
+        echo "RELEASE_BODY=🤖 Open this link on your Android devices (or scan the QR code) to install the app:%0A${BUILD_URL}" >> $GITHUB_OUTPUT
+
+    - name: Upload APK to GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ${{ steps.rename_apk.outputs.APK_FINAL_PATH }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
