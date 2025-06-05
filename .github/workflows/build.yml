@@ -52,10 +52,18 @@ jobs:
         mv app-release.apk $NEW_NAME
         echo "APK_FINAL_PATH=${NEW_NAME}" >> $GITHUB_OUTPUT
 
-    - name: Upload APK to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ${{ steps.rename_apk.outputs.APK_FINAL_PATH }}
+    - name: Check that APK file exists
+      run: ls -lh ${{ steps.rename_apk.outputs.APK_FINAL_PATH }}
+
+      # Upload APK to GitHub Release
+    - name: Upload APK to Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [ -f "${{ steps.rename_apk.outputs.APK_FINAL_PATH }}" ]; then
+          gh release upload "${{ github.ref_name }}" "${{ steps.rename_apk.outputs.APK_FINAL_PATH }}" --clobber
+        else
+          echo "APK not found at ${{ steps.rename_apk.outputs.APK_FINAL_PATH }}"
+          exit 1
+        fi
 
